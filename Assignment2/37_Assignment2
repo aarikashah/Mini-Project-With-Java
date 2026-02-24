@@ -1,0 +1,84 @@
+import java.util.Scanner;
+
+class Employee {
+    String name;
+    double salary;
+
+    Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    void displaySalary(double oldSalary) {
+        System.out.println("Employee Name: " + name);
+        System.out.println("Salary before hike: " + oldSalary);
+        System.out.println("Salary after hike: " + salary);
+        System.out.println("-----------------------------------");
+    }
+}
+
+class FullTimeEmployee extends Employee {
+
+    FullTimeEmployee(String name, double salary) {
+        super(name, salary);
+    }
+
+    void calculateSalary() {
+        double oldSalary = salary;
+        salary = salary + (salary * 0.50);  
+        displaySalary(oldSalary);
+    }
+}
+
+class InternEmployee extends Employee {
+
+    InternEmployee(String name, double salary) {
+        super(name, salary);
+    }
+
+    void calculateSalary() {
+        double oldSalary = salary;
+        salary = salary + (salary * 0.25);   
+        displaySalary(oldSalary);
+    }
+}
+
+public class ass2 {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of employees: ");
+        int n = sc.nextInt();
+        sc.nextLine(); 
+
+        for (int i = 1; i <= n; i++) {
+
+            System.out.println("\nEmployee " + i);
+
+            System.out.print("Enter name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter job type (fulltime/intern): ");
+            String type = sc.nextLine();
+
+            System.out.print("Enter salary: ");
+            double salary = sc.nextDouble();
+            sc.nextLine();
+
+            if (type.equalsIgnoreCase("fulltime")) {
+                FullTimeEmployee f = new FullTimeEmployee(name, salary);
+                f.calculateSalary();
+            } 
+            else if (type.equalsIgnoreCase("intern")) {
+                InternEmployee in = new InternEmployee(name, salary);
+                in.calculateSalary();
+            } 
+            else {
+                System.out.println("Invalid job type!");
+            }
+        }
+
+        sc.close();
+    }
+}
