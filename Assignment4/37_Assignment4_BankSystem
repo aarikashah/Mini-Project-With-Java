@@ -3,150 +3,199 @@ import java.util.*;
 
 class BankSystem{
 
-    public static void main(String args[]){
+static Map<Integer,String> names=new HashMap<>();
+static Map<Integer,Double> balance=new HashMap<>();
 
-        Scanner sc=new Scanner(System.in);
+static final String FILE="bank.txt";
 
-        int cid;
-        String cname;
-        double amount;
-        int choice;
+static boolean validAmount(double amt){
+return Math.round(amt*100)==amt*100;
+}
 
-        do{
+static void load() throws Exception{
 
-            System.out.println("\n1.Create Account");
-            System.out.println("2.Withdraw");
-            System.out.println("3.Deposit");
-            System.out.println("4.Display Records");
-            System.out.println("5.Exit");
+BufferedReader br=new BufferedReader(new FileReader(FILE));
 
-            System.out.println("Enter choice:");
-            choice=sc.nextInt();
+String line;
 
-            try{
+while((line=br.readLine())!=null){
 
-                switch(choice){
+String data[]=line.split(",");
 
-                    case 1:
+int id=Integer.parseInt(data[0]);
 
-                        System.out.println("Enter CID:");
-                        cid=sc.nextInt();
+names.put(id,data[1]);
 
-                        if(cid<1 || cid>20)
-                            throw new Exception("CID must be between 1 and 20");
+balance.put(id,Double.parseDouble(data[2]));
 
-                        System.out.println("Enter Name:");
-                        cname=sc.next();
+}
 
-                        System.out.println("Enter Amount:");
-                        amount=sc.nextDouble();
+br.close();
 
-                        if(amount<=0)
-                            throw new Exception("Amount must be positive");
+}
 
-                        if(amount<1000)
-                            throw new Exception("Minimum amount is 1000");
+static void save() throws Exception{
 
-                        FileWriter fw=new FileWriter("bank.txt",true);
+BufferedWriter bw=new BufferedWriter(new FileWriter(FILE));
 
-                        fw.write(cid+" "+cname+" "+String.format("%.2f",amount)+"\n");
+for(int id:names.keySet()){
 
-                        fw.close();
+bw.write(id+","+names.get(id)+","+balance.get(id));
 
-                        System.out.println("Account created");
+bw.newLine();
 
-                        break;
+}
 
-                    case 2:
+bw.close();
 
-                        System.out.println("Enter Balance:");
-                        double bal=sc.nextDouble();
+}
 
-                        System.out.println("Enter withdraw amount:");
-                        double wamt=sc.nextDouble();
+public static void main(String args[]){
 
-                        if(wamt<=1)
-                            throw new Exception("Withdraw amount must be greater than 1");
+Scanner sc=new Scanner(System.in);
 
-                        if(wamt>bal)
-                            throw new Exception("Insufficient balance");
+int choice;
 
-                        String wstr = String.valueOf(wamt);
+try{
 
-                        if(wstr.contains(".")){
-                            if(wstr.substring(wstr.indexOf('.')+1).length()>2)
-                                throw new Exception("Only 2 decimal places allowed");
-                        }
+load();
 
-                        bal=bal-wamt;
+}catch(Exception e){
 
-                        System.out.println("Remaining balance: "+String.format("%.2f",bal));
+System.out.println("Starting new file");
 
-                        break;
+}
 
-                    case 3:
+do{
 
-                        System.out.println("Enter Balance:");
-                        double dbal=sc.nextDouble();
+System.out.println("\n1.Create");
+System.out.println("2.Deposit");
+System.out.println("3.Withdraw");
+System.out.println("4.Display");
+System.out.println("5.Exit");
 
-                        System.out.println("Enter deposit amount:");
-                        double damt=sc.nextDouble();
+choice=sc.nextInt();
 
-                        if(damt<=0)
-                            throw new Exception("Deposit must be positive");
+try{
 
-                        String dstr = String.valueOf(damt);
+switch(choice){
 
-                        if(dstr.contains(".")){
-                            if(dstr.substring(dstr.indexOf('.')+1).length()>2)
-                                throw new Exception("Only 2 decimal places allowed");
-                        }
+case 1:
 
-                        dbal=dbal+damt;
+System.out.println("Enter CID");
 
-                        System.out.println("Updated balance: "+String.format("%.2f",dbal));
+int cid=sc.nextInt();
 
-                        break;
+if(names.containsKey(cid))
+throw new Exception("Account exists");
 
-                    case 4:
+System.out.println("Enter Name");
 
-                        BufferedReader br=new BufferedReader(new FileReader("bank.txt"));
+String name=sc.next();
 
-                        String line;
+System.out.println("Enter amount");
 
-                        System.out.println("\nCustomer Records:");
+double amt=sc.nextDouble();
 
-                        while((line=br.readLine())!=null){
-                            System.out.println(line);
-                        }
+if(!validAmount(amt))
+throw new Exception("Only 2 decimals");
 
-                        br.close();
+if(amt<1000)
+throw new Exception("Minimum 1000");
 
-                        break;
+names.put(cid,name);
 
-                    case 5:
+balance.put(cid,amt);
 
-                        System.out.println("Program ended");
+System.out.println("Account created");
 
-                        break;
+break;
 
-                    default:
+case 2:
 
-                        System.out.println("Invalid choice");
+System.out.println("Enter CID");
 
-                }
+int did=sc.nextInt();
 
-            }
+if(!names.containsKey(did))
+throw new Exception("Account not found");
 
-            catch(Exception e){
+System.out.println("Enter deposit");
 
-                System.out.println("Error: "+e.getMessage());
+double damt=sc.nextDouble();
 
-            }
+if(!validAmount(damt))
+throw new Exception("Only 2 decimals");
 
-        }while(choice!=5);
+if(damt<1)
+throw new Exception("Minimum deposit 1");
 
-        sc.close();
+balance.put(did,balance.get(did)+damt);
 
-    }
+System.out.println("Deposit done");
+
+break;
+
+case 3:
+
+System.out.println("Enter CID");
+
+int wid=sc.nextInt();
+
+if(!names.containsKey(wid))
+throw new Exception("Account not found");
+
+System.out.println("Enter withdraw");
+
+double wamt=sc.nextDouble();
+
+if(!validAmount(wamt))
+throw new Exception("Only 2 decimals");
+
+if(wamt<=1)
+throw new Exception("Withdraw >1");
+
+if(balance.get(wid)-wamt<1000)
+throw new Exception("Minimum balance 1000 required");
+
+balance.put(wid,balance.get(wid)-wamt);
+
+System.out.println("Withdraw done");
+
+break;
+
+case 4:
+
+for(int id:names.keySet()){
+
+System.out.println(id+" "+names.get(id)+" "+
+String.format("%.2f",balance.get(id)));
+
+}
+
+break;
+
+case 5:
+
+save();
+
+System.out.println("Saved");
+
+break;
+
+default:
+
+System.out.println("Invalid");
+
+}
+
+}catch(Exception e){
+
+System.out.println("Error: "+e.getMessage());
+
+}
+
+}while(choice!=5);
+
+}
 }
