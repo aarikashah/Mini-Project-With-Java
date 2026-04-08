@@ -16,8 +16,9 @@ class BankSystem{
 
             System.out.println("\n1.Create Account");
             System.out.println("2.Withdraw");
-            System.out.println("3.Display Records");
-            System.out.println("4.Exit");
+            System.out.println("3.Deposit");
+            System.out.println("4.Display Records");
+            System.out.println("5.Exit");
 
             System.out.println("Enter choice:");
             choice=sc.nextInt();
@@ -48,7 +49,7 @@ class BankSystem{
 
                         FileWriter fw=new FileWriter("bank.txt",true);
 
-                        fw.write(cid+" "+cname+" "+amount+"\n");
+                        fw.write(cid+" "+cname+" "+String.format("%.2f",amount)+"\n");
 
                         fw.close();
 
@@ -64,19 +65,50 @@ class BankSystem{
                         System.out.println("Enter withdraw amount:");
                         double wamt=sc.nextDouble();
 
-                        if(wamt<=0)
-                            throw new Exception("Amount must be positive");
+                        if(wamt<=1)
+                            throw new Exception("Withdraw amount must be greater than 1");
 
                         if(wamt>bal)
                             throw new Exception("Insufficient balance");
 
+                        String wstr = String.valueOf(wamt);
+
+                        if(wstr.contains(".")){
+                            if(wstr.substring(wstr.indexOf('.')+1).length()>2)
+                                throw new Exception("Only 2 decimal places allowed");
+                        }
+
                         bal=bal-wamt;
 
-                        System.out.println("Remaining balance:"+bal);
+                        System.out.println("Remaining balance: "+String.format("%.2f",bal));
 
                         break;
 
                     case 3:
+
+                        System.out.println("Enter Balance:");
+                        double dbal=sc.nextDouble();
+
+                        System.out.println("Enter deposit amount:");
+                        double damt=sc.nextDouble();
+
+                        if(damt<=0)
+                            throw new Exception("Deposit must be positive");
+
+                        String dstr = String.valueOf(damt);
+
+                        if(dstr.contains(".")){
+                            if(dstr.substring(dstr.indexOf('.')+1).length()>2)
+                                throw new Exception("Only 2 decimal places allowed");
+                        }
+
+                        dbal=dbal+damt;
+
+                        System.out.println("Updated balance: "+String.format("%.2f",dbal));
+
+                        break;
+
+                    case 4:
 
                         BufferedReader br=new BufferedReader(new FileReader("bank.txt"));
 
@@ -92,7 +124,7 @@ class BankSystem{
 
                         break;
 
-                    case 4:
+                    case 5:
 
                         System.out.println("Program ended");
 
@@ -112,7 +144,7 @@ class BankSystem{
 
             }
 
-        }while(choice!=4);
+        }while(choice!=5);
 
         sc.close();
 
